@@ -6,7 +6,7 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-	gem 'jmeter-test-runner', :git => 'http://gitlab.hepsiburada.com/everyone/jmeter-test-runner.git'
+	gem 'jmeter-test-runner', :git => 'git@gitlab.hepsiburada.com:everyone/jmeter-test-runner.git'
 
 And then execute:
 
