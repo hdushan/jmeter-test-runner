@@ -1,4 +1,3 @@
-require "jmeter-test-runner/version"
 require 'fileutils'
 require "net/http"
 require 'nokogiri'
@@ -17,7 +16,7 @@ module JmeterTestRunner
       @jmeter_standard_plugin_url = "http://jmeter-plugins.org/downloads/file/" + @jmeter_standard_plugin
       @jmeter_extras_plugin = "JMeterPlugins-Extras-1.2.0.zip"
       @jmeter_extras_plugin_url = "http://jmeter-plugins.org/downloads/file/" + @jmeter_extras_plugin
-      @jmeter_workspace = "build"
+      @jmeter_workspace = ENV['HOME']
       @jmeter_install_folder = "apache-jmeter-#{jmeter_version}"
       @jmeter_executable_file = "jmeter"
       @jmeter_standard_plugin_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/JMeterPlugins-Standard.jar"
