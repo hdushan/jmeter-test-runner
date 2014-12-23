@@ -11,7 +11,8 @@ module JmeterTestRunner
       @jmeter_test_plan = jmeter_test_plan
       @jmeter_test_result = jmeter_test_result
       @jmeter_test_result_format = jmeter_test_result_format
-      @jmeter_binary_url = "http://ftp.itu.edu.tr/Mirror/Apache//jmeter/binaries/apache-jmeter-#{jmeter_version}.tgz"
+      @jmeter_version = jmeter_version
+      @jmeter_binary_url = "http://ftp.itu.edu.tr/Mirror/Apache//jmeter/binaries/apache-jmeter-#{@jmeter_version}.tgz"
       @jmeter_standard_plugin = "JMeterPlugins-Standard-1.2.0.zip"
       @jmeter_standard_plugin_url = "http://jmeter-plugins.org/downloads/file/" + @jmeter_standard_plugin
       @jmeter_extras_plugin = "JMeterPlugins-Extras-1.2.0.zip"
@@ -41,6 +42,10 @@ module JmeterTestRunner
       end
     end
     
+    def is_os_supported?
+      (/linux|darwin/ =~ RUBY_PLATFORM) != nil
+    end
+    
     def remove_old_benchmark_results(jmeter_test_result_file, jmeter_html_output_file)
       puts "\nClearing old JMeter test result file ...\n"
       FileUtils.rm_f(jmeter_test_result_file)
@@ -49,24 +54,48 @@ module JmeterTestRunner
     
     def is_jmeter_installed?
       puts "\nChecking for presence of jmeter executable file #{@jmeter_command}\n"
-      return File.file? "#{@jmeter_command}"
+      if is_os_supported?
+        return File.file? "#{@jmeter_command}"
+      else
+        puts "\nJmeter not found (in folder #{@jmeter_workspace})."
+        puts "This gem cannot install jmeter automatically on this OS (yet..coming soon!)."
+        puts "Please install jmeter (version #{@jmeter_version}) manually into folder #{@jmeter_workspace}\n"
+        puts "\nCannot proceed. Hence exiting...\n"
+        raise
+      end
     end
     
     def is_jmeter_standard_plugin_installed?
       puts "\nChecking for presence of jmeter standard plugin #{@jmeter_standard_plugin_file}\n"
-      return File.file? "#{@jmeter_standard_plugin_file}"
+      if is_os_supported?
+        return File.file? "#{@jmeter_standard_plugin_file}"
+      else
+        puts "\nJmeter Standard Plugin not found (ie file #{@jmeter_standard_plugin_file})."
+        puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
+        puts "Please install Jmeter Standard plugin (#{@jmeter_standard_plugin_url}) manually and try again\n"
+        puts "\nCannot proceed. Hence exiting...\n"
+        raise
+      end
     end
     
     def is_jmeter_extras_plugin_installed?
       puts "\nChecking for presence of jmeter extras plugin #{@jmeter_extras_plugin_file}\n"
-      return File.file? "#{@jmeter_extras_plugin_file}"
+      if is_os_supported?
+        return File.file? "#{@jmeter_extras_plugin_file}"
+      else
+        puts "\nJmeter Extras Plugin not found (ie file #{@jmeter_extras_plugin_file})."
+        puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
+        puts "Please install Jmeter Standard plugin (#{@jmeter_extras_plugin_url}) manually and try again\n"
+        puts "\nCannot proceed. Hence exiting...\n"
+        raise
+      end
     end
     
     def install_jmeter
       puts "\nInstalling JMeter...\n"
       FileUtils.mkdir_p @jmeter_workspace
       Dir.chdir(@jmeter_workspace) do
-          `curl #{@jmeter_binary_url} | tar zxf -`
+        `curl #{@jmeter_binary_url} | tar zxf -`
       end
       puts "\nJMeter installed into folder #{@jmeter_workspace} ...\n"
     end
