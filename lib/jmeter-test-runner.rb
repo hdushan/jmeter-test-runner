@@ -24,10 +24,11 @@ module JmeterTestRunner
       @jmeter_standard_plugin_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/JMeterPlugins-Standard.jar"
       @jmeter_extras_plugin_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/JMeterPlugins-Extras.jar"
       @jmeter_path = "#{@jmeter_workspace}/#{@jmeter_install_folder}/bin"
+      @jmeter_command = "#{@jmeter_path}/#{@jmeter_executable_file}"
       if options != ''
-        @jmeter_command = "#{@jmeter_path}/#{@jmeter_executable_file} -J#{options}"
+        @jmeter_command_with_options = "#{@jmeter_command} -J#{options}"
       else
-        @jmeter_command = "#{@jmeter_path}/#{@jmeter_executable_file}"
+        @jmeter_command_with_options = "#{@jmeter_command}"
       end
       @jmeter_xslt_template_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/extras/jmeter-results-detail-report_21.xsl"
       @jmeter_html_output_file = jmeter_html_test_result
@@ -125,8 +126,8 @@ module JmeterTestRunner
     
     def execute_jmeter_test(test_plan, results_file, results_format)
       puts "\nExecuting JMeter test ...\n"
-      puts "\nCommand executed: #{@jmeter_command} -n -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}\n"
-      `#{@jmeter_command} -n -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}`
+      puts "\nCommand executed: #{@jmeter_command_with_options} -n -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}\n"
+      `#{@jmeter_command_with_options} -n -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}`
       puts "\nJMeter test completed ...\n"
     end
     
