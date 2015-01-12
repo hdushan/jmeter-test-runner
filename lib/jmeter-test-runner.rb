@@ -25,11 +25,7 @@ module JmeterTestRunner
       @jmeter_extras_plugin_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/JMeterPlugins-Extras.jar"
       @jmeter_path = "#{@jmeter_workspace}/#{@jmeter_install_folder}/bin"
       @jmeter_command = "#{@jmeter_path}/#{@jmeter_executable_file}"
-      if options != ''
-        @jmeter_command_with_options = "#{@jmeter_command} -J#{options}"
-      else
-        @jmeter_command_with_options = "#{@jmeter_command}"
-      end
+      @jmeter_options = options
       @jmeter_xslt_template_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/extras/jmeter-results-detail-report_21.xsl"
       @jmeter_html_output_file = jmeter_html_test_result
     end
@@ -40,7 +36,7 @@ module JmeterTestRunner
         install_jmeter unless is_jmeter_installed?
         install_jmeter_standard_plugin unless is_jmeter_standard_plugin_installed?
         install_jmeter_extras_plugin unless is_jmeter_extras_plugin_installed?
-        execute_jmeter_test(@jmeter_test_plan, @jmeter_test_result, @jmeter_test_result_format)
+        execute_jmeter_test(@jmeter_test_plan, @jmeter_test_result, @jmeter_test_result_format, @jmeter_options)
         create_html_output(@jmeter_html_output_file)  
       rescue => exception
         puts exception.message
@@ -124,9 +120,14 @@ module JmeterTestRunner
       puts "\nJMeter Extras plugin installed into folder #{@jmeter_workspace}/#{@jmeter_install_folder} ...\n"
     end
     
-    def execute_jmeter_test(test_plan, results_file, results_format)
+    def execute_jmeter_test(test_plan, results_file, results_format, options)
       puts "\nExecuting JMeter test ...\n"
-      puts "\nCommand executed: #{@jmeter_command_with_options} -n -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}\n"
+      if options != ''
+        jmeter_command_with_options = "#{@jmeter_command} -n -J#{options}"
+      else
+        jmeter_command_with_options = "#{@jmeter_command} -n"
+      end
+      puts "\nCommand executed: #{@jmeter_command_with_options} -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}\n"
       `#{@jmeter_command_with_options} -n -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}`
       puts "\nJMeter test completed ...\n"
     end
