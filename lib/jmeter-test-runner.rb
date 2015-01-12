@@ -127,8 +127,9 @@ module JmeterTestRunner
       else
         jmeter_command_with_options = "#{@jmeter_command} -n"
       end
-      puts "\nCommand executed: #{@jmeter_command_with_options} -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}\n"
-      `#{@jmeter_command_with_options} -n -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}`
+      command_to_execute = "#{jmeter_command_with_options} -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}"
+      puts "\n#{command_to_execute}\n"
+      `#{command_to_execute}`
       puts "\nJMeter test completed ...\n"
     end
     
