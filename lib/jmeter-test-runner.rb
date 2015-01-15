@@ -7,7 +7,7 @@ module JmeterTestRunner
 
     attr_reader :jmeter_path
     
-    def initialize(jmeter_test_plan, jmeter_test_result, jmeter_test_result_format, jmeter_html_test_result, options='', jmeter_version='2.12')
+    def initialize(jmeter_test_plan, jmeter_test_result, jmeter_test_result_format, jmeter_html_test_result="", options='', jmeter_version='2.12')
       @jmeter_test_plan = jmeter_test_plan
       @jmeter_test_result = jmeter_test_result
       @jmeter_test_result_format = jmeter_test_result_format
@@ -37,7 +37,9 @@ module JmeterTestRunner
         install_jmeter_standard_plugin unless is_jmeter_standard_plugin_installed?
         install_jmeter_extras_plugin unless is_jmeter_extras_plugin_installed?
         execute_jmeter_test(@jmeter_test_plan, @jmeter_test_result, @jmeter_test_result_format, @jmeter_options)
-        create_html_output(@jmeter_html_output_file)  
+        if @jmeter_html_output_file != ""
+          create_html_output(@jmeter_html_output_file)  
+        end
       rescue => exception
         puts exception.message
         puts exception.backtrace
