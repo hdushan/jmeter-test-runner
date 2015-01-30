@@ -26,7 +26,7 @@ module JmeterTestRunner
       @jmeter_path = "#{@jmeter_workspace}/#{@jmeter_install_folder}/bin"
       @jmeter_command = "#{@jmeter_path}/#{@jmeter_executable_file}"
       @jmeter_options = options
-      @jmeter_xslt_template_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/extras/jmeter-results-detail-report_21.xsl"
+      @jmeter_xslt_template_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/extras/jmeter-results-report_21.xsl"
       @jmeter_html_output_file = jmeter_html_test_result
     end
     
@@ -136,7 +136,7 @@ module JmeterTestRunner
       puts "\nExecuting JMeter test ...\n"
       options_string = ''
       options_string = create_options(options) unless options.empty?
-      command_to_execute = "#{@jmeter_command} -n #{options_string} -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}"
+      command_to_execute = "#{@jmeter_command} -n #{options_string} -Jjmeter.save.saveservice.output_format=#{results_format} -t #{test_plan} -l #{results_file}"
       puts "\n#{command_to_execute}\n"
       `#{command_to_execute}`
       puts "\nJMeter test completed ..., took #{(Time.now-start_time).to_i} seconds\n"
