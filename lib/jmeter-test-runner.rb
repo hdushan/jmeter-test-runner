@@ -34,7 +34,7 @@ module JmeterTestRunner
     
     def start
       begin
-        remove_old_benchmark_results(@jmeter_test_result, @jmeter_html_output_file)
+        remove_old_benchmark_results(@jmeter_test_result, @jmeter_summary_output_file)
         install_jmeter unless is_jmeter_installed?
         install_jmeter_standard_plugin unless is_jmeter_standard_plugin_installed?
         install_jmeter_extras_plugin unless is_jmeter_extras_plugin_installed?
@@ -61,10 +61,10 @@ module JmeterTestRunner
       (/linux|darwin/ =~ RUBY_PLATFORM) != nil
     end
     
-    def remove_old_benchmark_results(jmeter_test_result_file, jmeter_html_output_file)
+    def remove_old_benchmark_results(jmeter_test_result_file, jmeter_report_file)
       puts "\nClearing old JMeter test result file ...\n"
       FileUtils.rm_f(jmeter_test_result_file)
-      FileUtils.rm_f(jmeter_html_output_file)
+      FileUtils.rm_f(jmeter_report_file)
     end
     
     def is_jmeter_installed?
@@ -164,7 +164,7 @@ module JmeterTestRunner
     
     def create_csv_report(output_file)
       start_time = Time.now
-      command_to_execute = "java -jar #{@jmeter_reporter_tool} --tool Reporter --generate-csv #{@jmeter_summary_output_file} --input-jtl #{@jmeter_test_result} --plugin-type AggregateReport"
+      command_to_execute = "java -jar #{@jmeter_reporter_tool} --tool Reporter --generate-csv #{output_file} --input-jtl #{@jmeter_test_result} --plugin-type AggregateReport"
       puts "\n#{command_to_execute}\n"
       `#{command_to_execute}`
       puts "\nGenerated csv report #{output_file}, took #{(Time.now-start_time).to_i} seconds to generate report\n"
