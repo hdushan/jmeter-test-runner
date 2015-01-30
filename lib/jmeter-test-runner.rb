@@ -132,20 +132,23 @@ module JmeterTestRunner
     end
     
     def execute_jmeter_test(test_plan, results_file, results_format, options)
+      start_time = Time.now
       puts "\nExecuting JMeter test ...\n"
       options_string = ''
       options_string = create_options(options) unless options.empty?
       command_to_execute = "#{@jmeter_command} -n #{options_string} -Jjmeter.save.saveservice.output_format=#{results_format} -Jjmeter.save.saveservice.assertion_results=all -t #{test_plan} -l #{results_file}"
       puts "\n#{command_to_execute}\n"
       `#{command_to_execute}`
-      puts "\nJMeter test completed ...\n"
+      puts "\nJMeter test completed ..., took #{(Time.now-start_time).to_i} seconds\n"
     end
     
     def create_html_output(output_file)
+      start_time = Time.now
       template = Nokogiri::XSLT(File.read(@jmeter_xslt_template_file))
       document = Nokogiri::XML(File.read(@jmeter_test_result))
       transformed_document = template.transform(document)
       File.open(output_file, 'w').write(transformed_document)
+      puts "\nGenerated html report #{output_file}, took #{(Time.now-start_time).to_i} seconds to generate report\n"
     end
     
   end
