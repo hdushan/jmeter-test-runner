@@ -7,7 +7,7 @@ module JmeterTestRunner
 
     attr_reader :jmeter_path
     
-    def initialize(jmeter_test_plan, jmeter_test_result, jmeter_test_result_format, jmeter_html_test_result='', options={}, jmeter_version='2.12')
+    def initialize(jmeter_test_plan, jmeter_test_result, jmeter_test_result_format, summary_report_format='html', summary_report_file='', options={}, jmeter_version='2.12')
       @jmeter_test_plan = jmeter_test_plan
       @jmeter_test_result = jmeter_test_result
       @jmeter_test_result_format = jmeter_test_result_format
@@ -27,7 +27,9 @@ module JmeterTestRunner
       @jmeter_command = "#{@jmeter_path}/#{@jmeter_executable_file}"
       @jmeter_options = options
       @jmeter_xslt_template_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/extras/jmeter-results-report_21.xsl"
-      @jmeter_html_output_file = jmeter_html_test_result
+      @jmeter_summary_format = summary_report_format
+      @jmeter_summary_output_file = summary_report_file
+      @jmeter_reporter_tool = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/CMDRunner.jar"
     end
     
     def start
@@ -37,9 +39,18 @@ module JmeterTestRunner
         install_jmeter_standard_plugin unless is_jmeter_standard_plugin_installed?
         install_jmeter_extras_plugin unless is_jmeter_extras_plugin_installed?
         execute_jmeter_test(@jmeter_test_plan, @jmeter_test_result, @jmeter_test_result_format, @jmeter_options)
-        unless @jmeter_html_output_file.empty?
-          create_html_output(@jmeter_html_output_file)  
-        end
+        case @jmeter_summary_format
+        when 'html'
+          unless @jmeter_summary_output_file.empty?
+            create_html_report(@jmeter_summary_output_file)
+          end 
+        when 'csv' 
+          unless @jmeter_summary_output_file.empty?
+            create_csv_report(@jmeter_summary_output_file)
+          end
+        else
+          puts "\nWarning!! Invalid Report format \'#{@jmeter_summary_format}\'. Report will NOT be generated!\n"
+        end 
       rescue => exception
         puts exception.message
         puts exception.backtrace
@@ -142,13 +153,21 @@ module JmeterTestRunner
       puts "\nJMeter test completed ..., took #{(Time.now-start_time).to_i} seconds\n"
     end
     
-    def create_html_output(output_file)
+    def create_html_report(output_file)
       start_time = Time.now
       template = Nokogiri::XSLT(File.read(@jmeter_xslt_template_file))
       document = Nokogiri::XML(File.read(@jmeter_test_result))
       transformed_document = template.transform(document)
       File.open(output_file, 'w').write(transformed_document)
       puts "\nGenerated html report #{output_file}, took #{(Time.now-start_time).to_i} seconds to generate report\n"
+    end
+    
+    def create_csv_report(output_file)
+      start_time = Time.now
+      command_to_execute = "java -jar #{@jmeter_reporter_tool} --tool Reporter --generate-csv #{@jmeter_summary_output_file} --input-jtl #{@jmeter_test_result} --plugin-type AggregateReport"
+      puts "\n#{command_to_execute}\n"
+      `#{command_to_execute}`
+      puts "\nGenerated csv report #{output_file}, took #{(Time.now-start_time).to_i} seconds to generate report\n"
     end
     
   end
