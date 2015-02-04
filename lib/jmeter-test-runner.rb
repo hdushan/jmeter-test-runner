@@ -64,6 +64,14 @@ module JmeterTestRunner
       (/linux|darwin/ =~ RUBY_PLATFORM) != nil
     end
     
+    def is_windows?
+      (/linux|darwin/ =~ RUBY_PLATFORM) == nil
+    end
+
+    def is_not_windows?
+      !is_windows?
+    end
+    
     def remove_old_benchmark_results(jmeter_test_result_file, jmeter_report_file)
       puts "\nClearing old JMeter test result file ...\n"
       FileUtils.rm_f(jmeter_test_result_file)
@@ -116,6 +124,9 @@ module JmeterTestRunner
       FileUtils.mkdir_p @jmeter_workspace
       Dir.chdir(@jmeter_workspace) do
         `curl -LOk #{@jmeter_binary_url}; jar xf #{@jmeter_installer}`
+        if is_not_windows?
+          `chmod +x #{@jmeter_command}`
+        end
       end
       puts "\nJMeter installed into folder #{@jmeter_workspace} ...\n"
     end
