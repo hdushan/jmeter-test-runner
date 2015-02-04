@@ -5,14 +5,17 @@ require 'nokogiri'
 module JmeterTestRunner
   class Test
 
-    attr_reader :jmeter_path
+    attr_accessor :jmeter_test_plan, :jmeter_test_result, :jmeter_test_result_format
+    attr_accessor :jmeter_version, :jmeter_installer, :jmeter_binary_url, :jmeter_workspace, :jmeter_install_folder, :jmeter_executable_file, :jmeter_xslt_template_file
+    attr_accessor :jmeter_standard_plugin, :jmeter_standard_plugin_url, :jmeter_extras_plugin, :jmeter_extras_plugin_url
+    attr_reader :jmeter_path, :jmeter_standard_plugin_file, :jmeter_extras_plugin_file, :jmeter_path, :jmeter_command, :jmeter_options
     
     def initialize(jmeter_test_plan, jmeter_test_result, jmeter_test_result_format, summary_report_format='html', summary_report_file='', options={}, jmeter_version='2.12')
       @jmeter_test_plan = jmeter_test_plan
       @jmeter_test_result = jmeter_test_result
       @jmeter_test_result_format = jmeter_test_result_format
       @jmeter_version = jmeter_version
-      @jmeter_installer = "apache-jmeter-#{@jmeter_version}.tgz"
+      @jmeter_installer = "apache-jmeter-#{@jmeter_version}.zip"
       @jmeter_binary_url = "http://ftp.itu.edu.tr/Mirror/Apache//jmeter/binaries/#{@jmeter_installer}"
       @jmeter_standard_plugin = "JMeterPlugins-Standard-1.2.0.zip"
       @jmeter_standard_plugin_url = "http://jmeter-plugins.org/downloads/file/#{@jmeter_standard_plugin}"
@@ -21,15 +24,15 @@ module JmeterTestRunner
       @jmeter_workspace = ENV['HOME']
       @jmeter_install_folder = "apache-jmeter-#{jmeter_version}"
       @jmeter_executable_file = "jmeter"
-      @jmeter_standard_plugin_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/JMeterPlugins-Standard.jar"
-      @jmeter_extras_plugin_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/JMeterPlugins-Extras.jar"
-      @jmeter_path = "#{@jmeter_workspace}/#{@jmeter_install_folder}/bin"
-      @jmeter_command = "#{@jmeter_path}/#{@jmeter_executable_file}"
+      @jmeter_standard_plugin_file = File.join(@jmeter_workspace, @jmeter_install_folder, "lib", "ext", "JMeterPlugins-Standard.jar")
+      @jmeter_extras_plugin_file = File.join(@jmeter_workspace, @jmeter_install_folder, "lib", "ext", "JMeterPlugins-Extras.jar")
+      @jmeter_path = File.join(@jmeter_workspace, @jmeter_install_folder, "bin")
+      @jmeter_command = File.join(@jmeter_path, @jmeter_executable_file)
       @jmeter_options = options
-      @jmeter_xslt_template_file = "#{@jmeter_workspace}/#{@jmeter_install_folder}/extras/jmeter-results-report_21.xsl"
+      @jmeter_xslt_template_file = File.join(@jmeter_workspace, @jmeter_install_folder, "extras", "jmeter-results-report_21.xsl")
       @jmeter_summary_format = summary_report_format
       @jmeter_summary_output_file = summary_report_file
-      @jmeter_reporter_tool = "#{@jmeter_workspace}/#{@jmeter_install_folder}/lib/ext/CMDRunner.jar"
+      @jmeter_reporter_tool = File.join(@jmeter_workspace, @jmeter_install_folder, "lib", "ext", "CMDRunner.jar")
     end
     
     def start
@@ -112,25 +115,25 @@ module JmeterTestRunner
       puts "\nInstalling JMeter...\n"
       FileUtils.mkdir_p @jmeter_workspace
       Dir.chdir(@jmeter_workspace) do
-        `curl #{@jmeter_binary_url} | tar zxf -`
+        `curl -LOk #{@jmeter_binary_url}; jar xf #{@jmeter_installer}`
       end
       puts "\nJMeter installed into folder #{@jmeter_workspace} ...\n"
     end
     
     def install_jmeter_standard_plugin
       puts "\nInstalling JMeter Standard plugin...\n"
-      Dir.chdir(@jmeter_workspace+"/"+@jmeter_install_folder) do
-          `curl -LOk #{@jmeter_standard_plugin_url}; unzip -o #{@jmeter_standard_plugin}`
+      Dir.chdir(File.join(@jmeter_workspace, @jmeter_install_folder)) do
+          `curl -LOk #{@jmeter_standard_plugin_url}; jar xf #{@jmeter_standard_plugin}`
       end
-      puts "\nJMeter Standard plugin installed into folder #{@jmeter_workspace}/#{@jmeter_install_folder} ...\n"
+      puts "\nJMeter Standard plugin installed into folder #{File.join(@jmeter_workspace,@jmeter_install_folder)} ...\n"
     end
     
     def install_jmeter_extras_plugin
       puts "\nInstalling JMeter Extras plugin...\n"
-      Dir.chdir(@jmeter_workspace+"/"+@jmeter_install_folder) do
-          `curl -LOk #{@jmeter_extras_plugin_url}; unzip -o #{@jmeter_extras_plugin}`
+      Dir.chdir(File.join(@jmeter_workspace, @jmeter_install_folder)) do
+          `curl -LOk #{@jmeter_extras_plugin_url}; jar xf #{@jmeter_extras_plugin}`
       end
-      puts "\nJMeter Extras plugin installed into folder #{@jmeter_workspace}/#{@jmeter_install_folder} ...\n"
+      puts "\nJMeter Extras plugin installed into folder #{File.join(@jmeter_workspace,@jmeter_install_folder)} ...\n"
     end
     
     def create_options(options)
