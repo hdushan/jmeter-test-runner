@@ -81,42 +81,42 @@ module JmeterTestRunner
     def is_jmeter_installed?
       puts "\nChecking for presence of jmeter executable file #{@jmeter_command}\n"
       jmeter_installed = File.file? "#{@jmeter_command}"
-      if !is_os_supported?
-        if !jmeter_installed
-          puts "\nJmeter not found (in folder #{@jmeter_workspace})."
-          puts "This gem cannot install jmeter automatically on this OS (yet..coming soon!)."
-          puts "Please install jmeter (version #{@jmeter_version}) manually into folder #{@jmeter_workspace}\n"
-          raise "\nCannot proceed. Hence exiting...\n"
-        end
-      end
+      #if !is_os_supported?
+      #  if !jmeter_installed
+      #    puts "\nJmeter not found (in folder #{@jmeter_workspace})."
+      #    puts "This gem cannot install jmeter automatically on this OS (yet..coming soon!)."
+      #    puts "Please install jmeter (version #{@jmeter_version}) manually into folder #{@jmeter_workspace}\n"
+      #    raise "\nCannot proceed. Hence exiting...\n"
+      #  end
+      #end
       return jmeter_installed
     end
     
     def is_jmeter_standard_plugin_installed?
       puts "\nChecking for presence of jmeter standard plugin #{@jmeter_standard_plugin_file}\n"
       plugin_installed = File.file? "#{@jmeter_standard_plugin_file}"
-      if is_os_supported?
+      #if is_os_supported?
         return File.file? "#{@jmeter_standard_plugin_file}"
-      else
-        puts "\nJmeter Standard Plugin not found (ie file #{@jmeter_standard_plugin_file})."
-        puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
-        puts "Please install Jmeter Standard plugin (#{@jmeter_standard_plugin_url}) manually and try again\n"
-        puts "\nCannot proceed. Hence exiting...\n"
-        raise
-      end
+        #else
+        #puts "\nJmeter Standard Plugin not found (ie file #{@jmeter_standard_plugin_file})."
+        #puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
+       # puts "Please install Jmeter Standard plugin (#{@jmeter_standard_plugin_url}) manually and try again\n"
+        #puts "\nCannot proceed. Hence exiting...\n"
+        #raise
+        #end
     end
     
     def is_jmeter_extras_plugin_installed?
       puts "\nChecking for presence of jmeter extras plugin #{@jmeter_extras_plugin_file}\n"
-      if is_os_supported?
+      #if is_os_supported?
         return File.file? "#{@jmeter_extras_plugin_file}"
-      else
-        puts "\nJmeter Extras Plugin not found (ie file #{@jmeter_extras_plugin_file})."
-        puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
-        puts "Please install Jmeter Standard plugin (#{@jmeter_extras_plugin_url}) manually and try again\n"
-        puts "\nCannot proceed. Hence exiting...\n"
-        raise
-      end
+        #else
+        #puts "\nJmeter Extras Plugin not found (ie file #{@jmeter_extras_plugin_file})."
+        #puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
+        #puts "Please install Jmeter Standard plugin (#{@jmeter_extras_plugin_url}) manually and try again\n"
+        #puts "\nCannot proceed. Hence exiting...\n"
+        #raise
+        #end
     end
     
     def install_jmeter
