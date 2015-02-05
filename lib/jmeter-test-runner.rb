@@ -82,7 +82,7 @@ module JmeterTestRunner
           f_path = File.join(destination, f.name)
           puts "Extracting #{f.name} to .......#{f_path}"
           FileUtils.mkdir_p(File.dirname(f_path))
-          f.extract(f_path) 
+          f.extract(f_path) {true}
         end
       end
     end
