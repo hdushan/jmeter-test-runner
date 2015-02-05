@@ -123,7 +123,6 @@ module JmeterTestRunner
     def install_jmeter
       puts "\nInstalling JMeter...\n"
       FileUtils.mkdir_p @jmeter_workspace
-      unzip_file(@jmeter_installer, @jmeter_workspace)
       Dir.chdir(@jmeter_workspace) do
         `curl -LOk #{@jmeter_binary_url}`
         unzip_file(@jmeter_installer, @jmeter_workspace)
