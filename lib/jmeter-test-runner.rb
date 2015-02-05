@@ -138,7 +138,7 @@ module JmeterTestRunner
       puts "\nInstalling JMeter Standard plugin...\n"
       Dir.chdir(File.join(@jmeter_workspace, @jmeter_install_folder)) do
           `curl -LOk #{@jmeter_standard_plugin_url}`
-          unzip_file(@jmeter_standard_plugin, @jmeter_workspace)
+          unzip_file(@jmeter_standard_plugin, File.join(@jmeter_workspace,@jmeter_install_folder))
       end
       puts "\nJMeter Standard plugin installed into folder #{File.join(@jmeter_workspace,@jmeter_install_folder)} ...\n"
     end
@@ -147,7 +147,7 @@ module JmeterTestRunner
       puts "\nInstalling JMeter Extras plugin...\n"
       Dir.chdir(File.join(@jmeter_workspace, @jmeter_install_folder)) do
           `curl -LOk #{@jmeter_extras_plugin_url}`
-          unzip_file(@jmeter_extras_plugin, @jmeter_workspace)
+          unzip_file(@jmeter_extras_plugin, File.join(@jmeter_workspace,@jmeter_install_folder))
       end
       puts "\nJMeter Extras plugin installed into folder #{File.join(@jmeter_workspace,@jmeter_install_folder)} ...\n"
     end
