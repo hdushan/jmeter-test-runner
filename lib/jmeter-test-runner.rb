@@ -1,6 +1,7 @@
 require 'fileutils'
 require "net/http"
 require 'nokogiri'
+require 'zip'
 
 module JmeterTestRunner
   class Test
@@ -60,8 +61,10 @@ module JmeterTestRunner
       end
     end
     
-    def is_os_supported?
-      (/linux|darwin/ =~ RUBY_PLATFORM) != nil
+    def install
+      install_jmeter unless is_jmeter_installed?
+      install_jmeter_standard_plugin unless is_jmeter_standard_plugin_installed?
+      install_jmeter_extras_plugin unless is_jmeter_extras_plugin_installed?
     end
     
     def is_windows?
@@ -70,6 +73,19 @@ module JmeterTestRunner
 
     def is_not_windows?
       !is_windows?
+    end
+    
+    def unzip_file(zipped_file, destination)
+      Zip::File.open(file) do |zip_file|
+        zip_file.each do |f|
+          f_path = File.join(destination, f.name)
+          FileUtils.mkdir_p(File.dirname(f_path))
+          f.extract(f_path) 
+        end
+      end
+    end
+    
+    def download(download_url, save_as_file_name)
     end
     
     def remove_old_benchmark_results(jmeter_test_result_file, jmeter_report_file)
@@ -94,36 +110,21 @@ module JmeterTestRunner
     
     def is_jmeter_standard_plugin_installed?
       puts "\nChecking for presence of jmeter standard plugin #{@jmeter_standard_plugin_file}\n"
-      plugin_installed = File.file? "#{@jmeter_standard_plugin_file}"
-      #if is_os_supported?
-        return File.file? "#{@jmeter_standard_plugin_file}"
-        #else
-        #puts "\nJmeter Standard Plugin not found (ie file #{@jmeter_standard_plugin_file})."
-        #puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
-       # puts "Please install Jmeter Standard plugin (#{@jmeter_standard_plugin_url}) manually and try again\n"
-        #puts "\nCannot proceed. Hence exiting...\n"
-        #raise
-        #end
+      return File.file? "#{@jmeter_standard_plugin_file}"
     end
     
     def is_jmeter_extras_plugin_installed?
       puts "\nChecking for presence of jmeter extras plugin #{@jmeter_extras_plugin_file}\n"
-      #if is_os_supported?
-        return File.file? "#{@jmeter_extras_plugin_file}"
-        #else
-        #puts "\nJmeter Extras Plugin not found (ie file #{@jmeter_extras_plugin_file})."
-        #puts "This gem cannot install jmeter plugins automatically on this OS (yet..coming soon!)."
-        #puts "Please install Jmeter Standard plugin (#{@jmeter_extras_plugin_url}) manually and try again\n"
-        #puts "\nCannot proceed. Hence exiting...\n"
-        #raise
-        #end
+      return File.file? "#{@jmeter_extras_plugin_file}"
     end
     
     def install_jmeter
       puts "\nInstalling JMeter...\n"
       FileUtils.mkdir_p @jmeter_workspace
+      unzip_file(@jmeter_installer, @jmeter_workspace)
       Dir.chdir(@jmeter_workspace) do
-        `curl -LOk #{@jmeter_binary_url}; jar xf #{@jmeter_installer}`
+        `curl -LOk #{@jmeter_binary_url}`
+        unzip_file(@jmeter_installer, @jmeter_workspace)
         if is_not_windows?
           `chmod +x #{@jmeter_command}`
         end
@@ -134,7 +135,8 @@ module JmeterTestRunner
     def install_jmeter_standard_plugin
       puts "\nInstalling JMeter Standard plugin...\n"
       Dir.chdir(File.join(@jmeter_workspace, @jmeter_install_folder)) do
-          `curl -LOk #{@jmeter_standard_plugin_url}; jar xf #{@jmeter_standard_plugin}`
+          `curl -LOk #{@jmeter_standard_plugin_url}`
+          unzip_file(@jmeter_standard_plugin, @jmeter_workspace)
       end
       puts "\nJMeter Standard plugin installed into folder #{File.join(@jmeter_workspace,@jmeter_install_folder)} ...\n"
     end
@@ -142,7 +144,8 @@ module JmeterTestRunner
     def install_jmeter_extras_plugin
       puts "\nInstalling JMeter Extras plugin...\n"
       Dir.chdir(File.join(@jmeter_workspace, @jmeter_install_folder)) do
-          `curl -LOk #{@jmeter_extras_plugin_url}; jar xf #{@jmeter_extras_plugin}`
+          `curl -LOk #{@jmeter_extras_plugin_url}`
+          unzip_file(@jmeter_extras_plugin, @jmeter_workspace)
       end
       puts "\nJMeter Extras plugin installed into folder #{File.join(@jmeter_workspace,@jmeter_install_folder)} ...\n"
     end
