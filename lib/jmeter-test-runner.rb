@@ -76,7 +76,7 @@ module JmeterTestRunner
     end
     
     def unzip_file(zipped_file, destination)
-      Zip::File.open(file) do |zip_file|
+      Zip::File.open(zipped_file) do |zip_file|
         zip_file.each do |f|
           f_path = File.join(destination, f.name)
           FileUtils.mkdir_p(File.dirname(f_path))
