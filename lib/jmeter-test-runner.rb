@@ -97,7 +97,7 @@ module JmeterTestRunner
     def download_with_progress_bar(download_url, save_as_file_name)
       pbar = nil
       open(save_as_file_name, 'wb') do |f|
-        fo.print open(download_url,
+        f.print open(download_url,
           :content_length_proc => lambda { |t|
           if t && 0 < t
             pbar = ProgressBar.new("...", t)
