@@ -10,10 +10,10 @@ module JmeterTestRunner
 
     attr_accessor :jmeter_test_plan, :jmeter_test_result, :jmeter_test_result_format
     attr_accessor :jmeter_version, :jmeter_installer, :jmeter_binary_url, :jmeter_workspace, :jmeter_install_folder, :jmeter_executable_file, :jmeter_xslt_template_file
-    attr_accessor :jmeter_standard_plugin, :jmeter_standard_plugin_url, :jmeter_extras_plugin, :jmeter_extras_plugin_url
-    attr_reader :jmeter_path, :jmeter_standard_plugin_file, :jmeter_extras_plugin_file, :jmeter_path, :jmeter_command, :jmeter_options
+    attr_accessor :jmeter_standard_plugin, :jmeter_standard_plugin_url, :jmeter_extras_plugin, :jmeter_extras_plugin_url, :jmeter_options
+    attr_reader :jmeter_path, :jmeter_standard_plugin_file, :jmeter_extras_plugin_file, :jmeter_path, :jmeter_command
     
-    def initialize(jmeter_test_plan, jmeter_test_result, jmeter_test_result_format, summary_report_format='html', summary_report_file='', options={}, jmeter_version='2.12')
+    def initialize(jmeter_test_plan="", jmeter_test_result="", jmeter_test_result_format="", summary_report_format='html', summary_report_file='', options={}, jmeter_version='2.12')
       @jmeter_test_plan = jmeter_test_plan
       @jmeter_test_result = jmeter_test_result
       @jmeter_test_result_format = jmeter_test_result_format
@@ -38,12 +38,14 @@ module JmeterTestRunner
       @jmeter_reporter_tool = File.join(@jmeter_workspace, @jmeter_install_folder, "lib", "ext", "CMDRunner.jar")
     end
     
+    def configure
+      yield self
+    end
+    
     def start
       begin
         remove_old_benchmark_results(@jmeter_test_result, @jmeter_summary_output_file)
-        install_jmeter unless is_jmeter_installed?
-        install_jmeter_standard_plugin unless is_jmeter_standard_plugin_installed?
-        install_jmeter_extras_plugin unless is_jmeter_extras_plugin_installed?
+        install_jmeter_and_plugins
         execute_jmeter_test(@jmeter_test_plan, @jmeter_test_result, @jmeter_test_result_format, @jmeter_options)
         case @jmeter_summary_format
         when 'html'
@@ -63,7 +65,7 @@ module JmeterTestRunner
       end
     end
     
-    def install
+    def install_jmeter_and_plugins
       install_jmeter unless is_jmeter_installed?
       install_jmeter_standard_plugin unless is_jmeter_standard_plugin_installed?
       install_jmeter_extras_plugin unless is_jmeter_extras_plugin_installed?
