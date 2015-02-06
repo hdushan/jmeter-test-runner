@@ -6,11 +6,11 @@ Starts jmeter in non-GUI mode and runs a test plan. Creates csv or html summary 
 
 Add this line to your application's Gemfile:
 
-	gem 'jmeter-test-runner', :git => 'https://github.com/hdushan/jmeter-test-runner.git'
+  `gem 'jmeter-test-runner', :git => 'https://github.com/hdushan/jmeter-test-runner.git'`
 
 And then execute:
 
-    $ bundle install
+   `bundle install`
 
 ## Usage
 
@@ -69,13 +69,12 @@ end
 
 Complete list of things that are configurable:
 ```ruby
-	
+
   testRunner = JmeterTestRunner::Test.new
   testRunner.configure do |t|
     t.jmeter_test_plan = "perf/abcd.jmx"
     t.jmeter_test_result = "abcd.jtl"
     t.jmeter_test_result_format = "xml"
-    t.jmeter_version = "2.12"
     t.jmeter_installer = "apache-jmeter-2.12.zip"
     t.jmeter_binary_url = "http://ftp.itu.edu.tr/Mirror/Apache//jmeter/binaries/apache-jmeter-2.12.zip"
     t.jmeter_standard_plugin = "JMeterPlugins-Standard-1.2.0.zip"
