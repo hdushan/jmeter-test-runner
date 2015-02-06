@@ -89,14 +89,14 @@ module JmeterTestRunner
     end
     
     def download(download_url, save_as_file_name)
-      open("save_as_file_name","wb") do |f|
+      open(save_as_file_name,"wb") do |f|
         f << open(download_url).read
       end
     end
     
     def download_with_progress_bar(download_url, save_as_file_name)
       pbar = nil
-      open('save_as_file_name', 'wb') do |f|
+      open(save_as_file_name, 'wb') do |f|
         fo.print open(download_url,
           :content_length_proc => lambda { |t|
           if t && 0 < t
