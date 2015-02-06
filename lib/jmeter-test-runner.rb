@@ -136,7 +136,7 @@ module JmeterTestRunner
       puts "\nInstalling JMeter...\n"
       FileUtils.mkdir_p @jmeter_workspace
       Dir.chdir(@jmeter_workspace) do
-        download(@jmeter_binary_url, @jmeter_installer)
+        download_with_progress_bar(@jmeter_binary_url, @jmeter_installer)
         unzip_file(@jmeter_installer, @jmeter_workspace)
         if is_not_windows?
           File.chmod(0777, @jmeter_command)
@@ -148,7 +148,7 @@ module JmeterTestRunner
     def install_jmeter_standard_plugin
       puts "\nInstalling JMeter Standard plugin...\n"
       Dir.chdir(File.join(@jmeter_workspace, @jmeter_install_folder)) do
-        download(@jmeter_standard_plugin_url, @jmeter_standard_plugin)
+        download_with_progress_bar(@jmeter_standard_plugin_url, @jmeter_standard_plugin)
         unzip_file(@jmeter_standard_plugin, File.join(@jmeter_workspace,@jmeter_install_folder))
       end
       puts "\nJMeter Standard plugin installed into folder #{File.join(@jmeter_workspace,@jmeter_install_folder)} ...\n"
