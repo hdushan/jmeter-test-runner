@@ -2,6 +2,8 @@ require 'fileutils'
 require "net/http"
 require 'nokogiri'
 require 'zip'
+require 'open-uri'
+require 'progressbar'
 
 module JmeterTestRunner
   class Test
@@ -80,7 +82,6 @@ module JmeterTestRunner
       Zip::File.open(zipped_file) do |zip_file|
         zip_file.each do |f|
           f_path = File.join(destination, f.name)
-          #puts "Extracting #{f.name} to .......#{f_path}"
           FileUtils.mkdir_p(File.dirname(f_path))
           f.extract(f_path) {true}
         end
@@ -88,6 +89,26 @@ module JmeterTestRunner
     end
     
     def download(download_url, save_as_file_name)
+      open("save_as_file_name","wb") do |f|
+        f << open(download_url).read
+      end
+    end
+    
+    def download_with_progress_bar(download_url, save_as_file_name)
+      pbar = nil
+      open('save_as_file_name', 'wb') do |f|
+        fo.print open(download_url,
+          :content_length_proc => lambda { |t|
+          if t && 0 < t
+            pbar = ProgressBar.new("...", t)
+            pbar.file_transfer_mode
+          end
+          },
+
+          :progress_proc => lambda {|s|
+            pbar.set s if pbar
+          }).read
+      end
     end
     
     def remove_old_benchmark_results(jmeter_test_result_file, jmeter_report_file)
@@ -98,16 +119,7 @@ module JmeterTestRunner
     
     def is_jmeter_installed?
       puts "\nChecking for presence of jmeter executable file #{@jmeter_command}\n"
-      jmeter_installed = File.file? "#{@jmeter_command}"
-      #if !is_os_supported?
-      #  if !jmeter_installed
-      #    puts "\nJmeter not found (in folder #{@jmeter_workspace})."
-      #    puts "This gem cannot install jmeter automatically on this OS (yet..coming soon!)."
-      #    puts "Please install jmeter (version #{@jmeter_version}) manually into folder #{@jmeter_workspace}\n"
-      #    raise "\nCannot proceed. Hence exiting...\n"
-      #  end
-      #end
-      return jmeter_installed
+      return File.file? "#{@jmeter_command}"
     end
     
     def is_jmeter_standard_plugin_installed?
@@ -124,10 +136,10 @@ module JmeterTestRunner
       puts "\nInstalling JMeter...\n"
       FileUtils.mkdir_p @jmeter_workspace
       Dir.chdir(@jmeter_workspace) do
-        `curl -LOk #{@jmeter_binary_url}`
+        download(@jmeter_binary_url, @jmeter_installer)
         unzip_file(@jmeter_installer, @jmeter_workspace)
         if is_not_windows?
-          `chmod +x #{@jmeter_command}`
+          File.chmod(0777, @jmeter_command)
         end
       end
       puts "\nJMeter installed into folder #{@jmeter_workspace} ...\n"
